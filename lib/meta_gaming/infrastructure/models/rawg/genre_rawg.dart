@@ -25,8 +25,8 @@ class GenreRawg {
         slug: json["slug"],
         gamesCount: json["games_count"],
         imageBackground: json["image_background"],
-        domain: domainValues.map[json["domain"]]!,
-        language: languageValues.map[json["language"]]!,
+        domain: domainValues.map[json["domain"]],
+        language: languageValues.map[json["language"]],
     );
 
     Map<String, dynamic> toJson() => {

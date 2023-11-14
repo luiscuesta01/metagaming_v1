@@ -1,17 +1,18 @@
 import 'package:flutter/material.dart';
 
 ThemeData lightTheme = ThemeData(
+  fontFamily: 'OpenSans',
   brightness: Brightness.light,
   useMaterial3: true,
-  scaffoldBackgroundColor: Colors.transparent,
+  //scaffoldBackgroundColor: Colors.transparent,
   //Paleta de colores Light Theme proyecto integraITV
   colorScheme: const ColorScheme.light(
     shadow: Color.fromRGBO(103, 114, 148, 0.16),
     background:  Color(0xFFFFFFFF),
     onBackground: Color(0x00000000),
-    outline: Color(0xFFE6007E),
+    outline: Color(0xFF4B87FF),
 
-    primary: Color(0xFFE6007E),
+    primary: Color(0xFF4B87FF),
     onPrimary: Color(0xFFFFFFFF),
     primaryContainer: Color(0xFFFFD5EC),
     onPrimaryContainer: Color(0xFF3C0021),

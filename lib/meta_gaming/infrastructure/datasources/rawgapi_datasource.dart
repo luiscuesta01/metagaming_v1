@@ -6,8 +6,12 @@ import 'package:metagaming/meta_gaming/infrastructure/mappers/game_mapper.dart';
 import 'package:metagaming/meta_gaming/infrastructure/models/rawg/game_rawg.dart';
 import 'package:metagaming/meta_gaming/infrastructure/models/rawg/rawg_response.dart';
 
+
+
 class RawgApiDatasource extends GamesDatasource{
-  
+
+
+  //Instancia de dio con la base de las llamadas y la api key.
     final dio = Dio(BaseOptions(
       baseUrl: 'https://api.rawg.io/api',
       queryParameters: {
@@ -15,6 +19,8 @@ class RawgApiDatasource extends GamesDatasource{
       }
     ));
 
+
+  //Metodos que hacen las llamadas a los diferentes end-points de la api.
   @override
   Future<List<Game>> getNowPlaying({int page = 1}) async{
     
