@@ -4,6 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:metagaming/config/constants/environment.dart';
 import 'package:metagaming/meta_gaming/presentation/components/animated_bar.dart';
 import 'package:metagaming/meta_gaming/presentation/providers/games/games_providers.dart';
+import 'package:metagaming/meta_gaming/presentation/providers/games/games_slideshow_provider.dart';
 import 'package:metagaming/meta_gaming/presentation/screens/utils/rive_utils.dart';
 import 'package:metagaming/meta_gaming/presentation/widgets/games/games_slideshow.dart';
 import 'package:rive/rive.dart';
@@ -20,11 +21,7 @@ class HomeScreen extends StatefulWidget {
 }
 
 class _HomeScreenState extends State<HomeScreen> {
-  @override
-  void initState() {
-    // TODO: implement initState
-    super.initState();
-  }
+ 
 
   RiveAsset selectedBottomNav = bottomNavs.first;
   @override
@@ -116,7 +113,8 @@ class _HomeViewState extends ConsumerState<_HomeView> {
   }
   @override
   Widget build(BuildContext context) {
-    final nowPlayingGames= ref.watch(nowPlayingGamesProvider);
+    final slideShowGames = ref.watch(gamesSlideShowProvider);
+
     return SafeArea(
         child: Column(
       children: [
@@ -241,7 +239,7 @@ class _HomeViewState extends ConsumerState<_HomeView> {
             ],
           ),
         ),
-        GamesSlideShow(games: nowPlayingGames)
+        GamesSlideShow(games: slideShowGames)
       ],
     ));
   }
