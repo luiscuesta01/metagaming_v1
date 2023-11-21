@@ -15,7 +15,7 @@ class RawgApiDatasource extends GamesDatasource{
     final dio = Dio(BaseOptions(
       baseUrl: 'https://api.rawg.io/api',
       queryParameters: {
-        'key': Enviroment.rawgKey
+        'key': Environment.rawgKey
       }
     ));
 
