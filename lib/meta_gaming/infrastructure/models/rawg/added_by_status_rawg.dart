@@ -16,12 +16,12 @@ class AddedByStatusRawg {
     });
 
     factory AddedByStatusRawg.fromJson(Map<String, dynamic> json) => AddedByStatusRawg(
-        yet: json["yet"],
-        owned: json["owned"],
-        beaten: json["beaten"],
-        toplay: json["toplay"],
-        dropped: json["dropped"],
-        playing: json["playing"],
+        yet: json["yet"] ?? 0,
+        owned: json["owned"] ?? 0,
+        beaten: json["beaten"]?? 0,
+        toplay: json["toplay"]?? 0,
+        dropped: json["dropped"]?? 0,
+        playing: json["playing"]?? 0,
     );
 
     Map<String, dynamic> toJson() => {

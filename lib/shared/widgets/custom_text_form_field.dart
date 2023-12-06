@@ -26,7 +26,7 @@ class CustomTextFormField extends StatelessWidget {
   Widget build(BuildContext context) {
 
     final colors = Theme.of(context).colorScheme;
-
+    final currentSize = MediaQuery.of(context).size;
     final border = OutlineInputBorder(
       borderSide: const BorderSide(color: Colors.transparent),
       borderRadius: BorderRadius.circular(40)
@@ -35,6 +35,7 @@ class CustomTextFormField extends StatelessWidget {
     const borderRadius = Radius.circular(15);
 
     return Container(
+      height: currentSize.height * 0.08,
       // padding: const EdgeInsets.only(bottom: 0, top: 15),
       decoration: BoxDecoration(
         color: Colors.white,
@@ -60,7 +61,7 @@ class CustomTextFormField extends StatelessWidget {
           errorBorder: border.copyWith( borderSide: const BorderSide( color: Colors.transparent )),
           focusedErrorBorder: border.copyWith( borderSide: const BorderSide( color: Colors.transparent )),
           isDense: true,
-          label: label != null ? Text(label!) : null,
+          label: label != null ? Text(label!, style: TextStyle(color:Colors.grey),) : null,
           hintText: hint,
           errorText: errorMessage,
           focusColor: colors.primary,

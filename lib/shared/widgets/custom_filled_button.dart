@@ -15,11 +15,13 @@ class CustomFilledButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-
+     final colors = Theme.of(context).colorScheme;
     const radius = Radius.circular(10);
 
     return FilledButton(
+      
       style: FilledButton.styleFrom(
+        
         backgroundColor: buttonColor,
         shape: const RoundedRectangleBorder(
         borderRadius: BorderRadius.only(
@@ -31,7 +33,7 @@ class CustomFilledButton extends StatelessWidget {
         
   
       onPressed: onPressed, 
-      child: Text(text)
+      child: Text(text, style: TextStyle(color: colors.onBackground, fontSize: 18),)
     );
   }
 }

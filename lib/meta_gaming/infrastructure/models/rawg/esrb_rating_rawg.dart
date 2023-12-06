@@ -10,9 +10,9 @@ class EsrbRatingRawg {
     });
 
     factory EsrbRatingRawg.fromJson(Map<String, dynamic> json) => EsrbRatingRawg(
-        id: json["id"],
-        name: json["name"],
-        slug: json["slug"],
+        id: json["id"] ?? 0,
+        name: json["name"] ?? '',
+        slug: json["slug"] ?? '',
     );
 
     Map<String, dynamic> toJson() => {

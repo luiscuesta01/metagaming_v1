@@ -44,14 +44,16 @@ class RegisterScreen extends StatelessWidget {
 
                 const SizedBox( height: 50 ),
     
-                Container(
-                  height: size.height - 260, // 80 los dos sizebox y 100 el ícono
-                  width: double.infinity,
-                  decoration: BoxDecoration(
-                    color: scaffoldBackgroundColor,
-                    borderRadius: const BorderRadius.only(topLeft: Radius.circular(100)),
+                SingleChildScrollView(
+                  child: Container(
+                    height: size.height - 260, // 80 los dos sizebox y 100 el ícono
+                    width: double.infinity,
+                    decoration: BoxDecoration(
+                      color: scaffoldBackgroundColor,
+                      borderRadius: const BorderRadius.only(topLeft: Radius.circular(100)),
+                    ),
+                    child: const _RegisterForm(),
                   ),
-                  child: const _RegisterForm(),
                 )
               ],
             ),

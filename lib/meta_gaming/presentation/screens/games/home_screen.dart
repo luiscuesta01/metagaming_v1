@@ -1,15 +1,9 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:metagaming/config/constants/environment.dart';
-import 'package:metagaming/meta_gaming/presentation/components/animated_bar.dart';
 import 'package:metagaming/meta_gaming/presentation/providers/games/games_providers.dart';
-import 'package:metagaming/meta_gaming/presentation/providers/games/games_slideshow_provider.dart';
-import 'package:metagaming/meta_gaming/presentation/screens/utils/rive_utils.dart';
-import 'package:metagaming/meta_gaming/presentation/widgets/games/games_slideshow.dart';
-import 'package:rive/rive.dart';
+import 'package:metagaming/meta_gaming/presentation/providers/providers.dart';
+import 'package:metagaming/meta_gaming/presentation/widgets/widgets.dart';
 
-import '../../../domain/entities/rive_asset.dart';
 
 class HomeScreen extends StatefulWidget {
   static const name = 'home-screen';
@@ -21,78 +15,19 @@ class HomeScreen extends StatefulWidget {
 }
 
 class _HomeScreenState extends State<HomeScreen> {
- 
-
-  RiveAsset selectedBottomNav = bottomNavs.first;
   @override
   Widget build(BuildContext context) {
     final colors = Theme.of(context).colorScheme;
     return Scaffold(
-      body: _HomeView(colors: colors),
-      bottomNavigationBar: SafeArea(
-          child: Container(
-        padding: EdgeInsets.all(12),
-        margin: EdgeInsets.symmetric(horizontal: 24),
-        decoration: BoxDecoration(
-            color: colors.primaryContainer,
-            borderRadius: BorderRadius.all(Radius.circular(24))),
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          children: [
-            ...List.generate(
-                bottomNavs.length,
-                (index) => GestureDetector(
-                      onTap: () {
-                        bottomNavs[index].input!.change(true);
-                        if (bottomNavs[index] != selectedBottomNav) {
-                          setState(() {
-                            selectedBottomNav = bottomNavs[index];
-                          });
-                        }
-                        Future.delayed(const Duration(seconds: 1), () {
-                          bottomNavs[index].input!.change(false);
-                        });
-                      },
-                      child: Column(
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          AnimatedBar(
-                              isActive: bottomNavs[index] == selectedBottomNav,
-                              colors: colors),
-                          SizedBox(
-                            height: 36,
-                            width: 36,
-                            child: Opacity(
-                              opacity: bottomNavs[index] == selectedBottomNav
-                                  ? 1
-                                  : 0.5,
-                              child: RiveAnimation.asset(
-                                bottomNavs.first.src,
-                                artboard: bottomNavs[index].artboard,
-                                onInit: (artboard) {
-                                  StateMachineController controller =
-                                      RiveUtils.getRiveController(artboard,
-                                          stateMachineName: bottomNavs[index]
-                                              .stateMachineName);
-                                  bottomNavs[index].input =
-                                      controller.findSMI("active") as SMIBool;
-                                },
-                              ),
-                            ),
-                          ),
-                        ],
-                      ),
-                    ))
-          ],
-        ),
-      )),
-    );
+        body: _HomeView(colors: colors),
+        bottomNavigationBar: Padding(
+          padding: const EdgeInsets.only(bottom: 8),
+          child: const CustomBottomNavigationBar(),
+        ));
   }
 }
 
 class _HomeView extends ConsumerStatefulWidget {
-
-
   const _HomeView({
     super.key,
     required this.colors,
@@ -105,20 +40,34 @@ class _HomeView extends ConsumerStatefulWidget {
 }
 
 class _HomeViewState extends ConsumerState<_HomeView> {
+  int currentSlideShow = 1;
+  int selectedButton = 1;
+
   @override
   void initState() {
     super.initState();
 
     ref.read(nowPlayingGamesProvider.notifier).loadNextPage();
+    ref.read(popularGamesProvider.notifier).loadNextPage();
+    ref.read(recommendedGamesProvider.notifier).loadNextPage();
   }
+  
   @override
   Widget build(BuildContext context) {
-    final slideShowGames = ref.watch(gamesSlideShowProvider);
+
+    final initialLoading = ref.watch(initialLoadingProvider);
+    if(initialLoading) return  FullScreenLoader();
+
+    final nowPlayngGamesSlide = ref.watch(nowPlayingGamesProvider);
+    final popularGamesSlide = ref.watch(popularGamesProvider);
+    final recommendedGamesSlide = ref.watch(recommendedGamesProvider);
+    
+    
 
     return SafeArea(
         child: SingleChildScrollView(
-          child: Column(
-                children: [
+      child: Column(
+        children: [
           Padding(
             padding: const EdgeInsets.all(25),
             child: IntrinsicHeight(
@@ -127,7 +76,8 @@ class _HomeViewState extends ConsumerState<_HomeView> {
                   Container(
                     decoration: BoxDecoration(
                         shape: BoxShape.circle,
-                        border: Border.all(color: widget.colors.primary, width: 1)),
+                        border:
+                            Border.all(color: widget.colors.primary, width: 1)),
                     child: CircleAvatar(
                       radius: 25,
                       backgroundImage: NetworkImage(
@@ -188,9 +138,8 @@ class _HomeViewState extends ConsumerState<_HomeView> {
               ),
             ),
           ),
-              
           const Padding(
-            padding:  EdgeInsets.only(left: 25.0, top: 2),
+            padding: EdgeInsets.only(left: 25.0, top: 2),
             child: Align(
                 alignment: Alignment.centerLeft,
                 child: Text(
@@ -198,7 +147,6 @@ class _HomeViewState extends ConsumerState<_HomeView> {
                   style: TextStyle(fontSize: 14, color: Color(0xFF7B8395)),
                 )),
           ),
-              
           const Padding(
             padding: EdgeInsets.symmetric(vertical: 8, horizontal: 25),
             child: Row(
@@ -213,36 +161,53 @@ class _HomeViewState extends ConsumerState<_HomeView> {
               ],
             ),
           ),
-              
           Padding(
             padding: const EdgeInsets.symmetric(vertical: 20, horizontal: 12),
             child: Row(
               mainAxisAlignment: MainAxisAlignment.start,
               children: [
                 TextButton(
-                    onPressed: () {},
-                    child: Text(
-                      'Populares',
-                      style: TextStyle(color: widget.colors.onBackground),
-                    )),
-                TextButton(
-                    onPressed: () {},
+                    onPressed: () {
+                      setState(() {
+                        selectedButton = 1;
+                        currentSlideShow = 1;
+                      });
+                    },
                     child: Text(
                       'Novedades',
-                      style: TextStyle(color: Color(0xFF7B8395)),
+                      style: TextStyle(color: selectedButton == 1 ? widget.colors.onBackground : Color(0xFF7B8395)),
                     )),
                 TextButton(
-                    onPressed: () {},
+                    onPressed: () {
+                      setState(() {
+                        selectedButton = 2;
+                        currentSlideShow = 2;
+                      });
+                    },
+                    child: Text(
+                      'Populares',
+                      style: TextStyle(color: selectedButton == 2 ? widget.colors.onBackground : Color(0xFF7B8395)),
+                    )),
+                TextButton(
+                    onPressed: () {
+                      setState(() {
+                        selectedButton = 3;
+                        currentSlideShow = 3;
+                      });
+                    },
                     child: Text(
                       'Recomendados',
-                      style: TextStyle(color: Color(0xFF7B8395)),
+                      style: TextStyle(color: selectedButton == 3 ? widget.colors.onBackground : Color(0xFF7B8395)),
                     ))
               ],
             ),
           ),
-          GamesSlideShow(games: slideShowGames)
-                ],
-              ),
-        ));
+
+          if (currentSlideShow == 1) GamesSlideShow(games: nowPlayngGamesSlide),
+          if (currentSlideShow == 2) GamesSlideShow(games: popularGamesSlide),
+          if (currentSlideShow == 3) GamesSlideShow(games: recommendedGamesSlide)
+        ],
+      ),
+    ));
   }
 }

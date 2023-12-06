@@ -15,9 +15,10 @@ class LoginScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
 
-    final size = MediaQuery.of(context).size;
+    final currentsize = MediaQuery.of(context).size;
     final scaffoldBackgroundColor = Theme.of(context).scaffoldBackgroundColor;
-
+    final colors = Theme.of(context).colorScheme;
+    final currentSize = MediaQuery.of(context).size;
     return GestureDetector(
       onTap: () => FocusManager.instance.primaryFocus?.unfocus(),
       child: Scaffold(
@@ -27,20 +28,18 @@ class LoginScreen extends StatelessWidget {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.center,
               children: [
-                const SizedBox( height: 80 ),
+                const SizedBox( height: 70 ),
                 // Icon Banner
-                const Icon( 
-                  Icons.production_quantity_limits_rounded, 
-                  color: Colors.white,
-                  size: 100,
-                ),
-                const SizedBox( height: 80 ),
+                Image.asset('assets/images/logo_sin_fondo.png', width: currentSize.height * 0.18,),
+          Text('MetaGaming', style: TextStyle(fontSize: 25, color: colors.primary),),
+
+                const SizedBox( height: 30),
     
                 Container(
-                  height: size.height - 260, // 80 los dos sizebox y 100 el ícono
+                  height: currentSize.height - 260, // 80 los dos sizebox y 100 el ícono
                   width: double.infinity,
                   decoration: BoxDecoration(
-                    color: scaffoldBackgroundColor,
+                    color: colors.background,
                     borderRadius: const BorderRadius.only(topLeft: Radius.circular(100)),
                   ),
                   child: const _LoginForm(),
@@ -68,9 +67,8 @@ class _LoginForm extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-
+    final colors = Theme.of(context).colorScheme;
     final loginForm = ref.watch(loginFormProvider);
-
     ref.listen(authProvider, (previous, next) {
       if ( next.errorMessage.isEmpty ) return;
       showSnackbar( context, next.errorMessage );
@@ -78,15 +76,18 @@ class _LoginForm extends ConsumerWidget {
 
 
     final textStyles = Theme.of(context).textTheme;
-
+    final currentSize = MediaQuery.of(context).size;
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 50),
       child: Column(
         children: [
           const SizedBox( height: 50 ),
-          Text('Login', style: textStyles.titleLarge ),
-          const SizedBox( height: 90 ),
+          
 
+          Text('Login', style: textStyles.titleLarge ),
+        
+          const SizedBox( height: 50 ),
+          
           CustomTextFormField(
             label: 'Correo',
             keyboardType: TextInputType.emailAddress,
@@ -110,14 +111,14 @@ class _LoginForm extends ConsumerWidget {
 
           SizedBox(
             width: double.infinity,
-            height: 60,
+            height: currentSize.height * 0.075,
             child: CustomFilledButton(
-              text: 'Ingresar',
+              text: 'Entrar',
               buttonColor: Colors.black,
               // onPressed: loginForm.isPosting
               //   ? null 
               //   : ref.read(loginFormProvider.notifier).onFormSubmit
-               onPressed:()=> context.push('/register')
+               onPressed:()=> context.push('/')
             )
           ),
 

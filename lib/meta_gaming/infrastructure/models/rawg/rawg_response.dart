@@ -38,15 +38,15 @@ class RawgResponse {
         next: json["next"],
         previous: json["previous"],
         results: List<GameRawg>.from(json["results"].map((x) => GameRawg.fromJson(x))),
-        seoTitle: json["seo_title"],
-        seoDescription: json["seo_description"],
-        seoKeywords: json["seo_keywords"],
-        seoH1: json["seo_h1"],
-        noindex: json["noindex"],
-        nofollow: json["nofollow"],
-        description: json["description"],
-        filters: Filters.fromJson(json["filters"]),
-        nofollowCollections: List<String>.from(json["nofollow_collections"].map((x) => x)),
+        seoTitle: json["seo_title"] ?? '',
+        seoDescription: json["seo_description"]?? '',
+        seoKeywords: json["seo_keywords"]?? '',
+        seoH1: json["seo_h1"]?? '',
+        noindex: json["noindex"] ?? false,
+        nofollow: json["nofollow"] ?? false,
+        description: json["description"] ?? '',
+        filters: Filters.fromJson(json["filters"]??{'filter1': 'default'}),
+        nofollowCollections: List<String>.from(json["nofollow_collections"]?.map((x) => x) ?? []),
     );
 
     Map<String, dynamic> toJson() => {
@@ -74,8 +74,8 @@ class Filters {
     });
 
     factory Filters.fromJson(Map<String, dynamic> json) => Filters(
-        years: List<FiltersYear>.from(json["years"].map((x) => FiltersYear.fromJson(x))),
-    );
+ years: List<FiltersYear>.from(json["years"]?.map((x) => FiltersYear.fromJson(x)) ?? []),
+);
 
     Map<String, dynamic> toJson() => {
         "years": List<dynamic>.from(years.map((x) => x.toJson())),

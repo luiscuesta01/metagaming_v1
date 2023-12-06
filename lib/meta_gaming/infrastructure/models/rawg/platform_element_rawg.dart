@@ -16,7 +16,7 @@ class PlatformElementRawg {
 
     factory PlatformElementRawg.fromJson(Map<String, dynamic> json) => PlatformElementRawg(
         platform: PlatformPlatformRawg.fromJson(json["platform"]),
-        releasedAt: DateTime.parse(json["released_at"]),
+        releasedAt: DateTime.parse(json["released_at"] ?? '0000-00-00'),
         requirementsEn: json["requirements_en"] == null ? null : RequirementsRawg.fromJson(json["requirements_en"]),
         requirementsRu: json["requirements_ru"] == null ? null : RequirementsRawg.fromJson(json["requirements_ru"]),
     );

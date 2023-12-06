@@ -23,8 +23,8 @@ class GenreRawg {
         id: json["id"],
         name: json["name"],
         slug: json["slug"],
-        gamesCount: json["games_count"],
-        imageBackground: json["image_background"],
+        gamesCount: json["games_count"] ?? 0,
+        imageBackground: json["image_background"] ?? 'https://upload.wikimedia.org/wikipedia/commons/thumb/6/65/No-Image-Placeholder.svg/1665px-No-Image-Placeholder.svg.png',
         domain: domainValues.map[json["domain"]],
         language: languageValues.map[json["language"]],
     );

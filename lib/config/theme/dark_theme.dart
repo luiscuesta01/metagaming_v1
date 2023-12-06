@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
 ThemeData darkTheme = ThemeData(
-  fontFamily: 'OpenSans',
+  fontFamily: 'Noto Sans',
   brightness: Brightness.dark,
   useMaterial3: true,
   //scaffoldBackgroundColor: Colors.transparent,

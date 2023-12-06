@@ -10,7 +10,7 @@ class StoreRawg {
     });
 
     factory StoreRawg.fromJson(Map<String, dynamic> json) => StoreRawg(
-        id: json["id"],
+        id: json["id"] ?? 0,
         store: GenreRawg.fromJson(json["store"]),
     );
 

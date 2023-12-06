@@ -15,6 +15,25 @@ final nowPlayingGamesProvider = StateNotifierProvider<GamesNotifier, List<Game>>
   );
 });
 
+
+final popularGamesProvider = StateNotifierProvider<GamesNotifier, List<Game>>((ref) {
+  
+  final fetchMoreGames = ref.watch(gameRepositoryProvider).getPopular;
+  
+  return GamesNotifier(
+    fetchMoreGames: fetchMoreGames
+  );
+});
+
+final recommendedGamesProvider = StateNotifierProvider<GamesNotifier, List<Game>>((ref) {
+  
+  final fetchMoreGames = ref.watch(gameRepositoryProvider).getRecomended;
+  
+  return GamesNotifier(
+    fetchMoreGames: fetchMoreGames
+  );
+});
+
 typedef GameCallback = Future<List<Game>> Function({int page});
 
 

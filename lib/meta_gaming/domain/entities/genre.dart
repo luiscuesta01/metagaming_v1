@@ -18,6 +18,7 @@ class Genre {
         //required this.domain,
         //required this.language,
     });
+    
     factory Genre.fromGenreRawg(GenreRawg genreRawg) => Genre(
       id: genreRawg.id, 
       name: genreRawg.name, 
