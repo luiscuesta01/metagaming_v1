@@ -18,6 +18,20 @@ class RawgApiDatasource extends GamesDatasource {
       baseUrl: 'https://api.rawg.io/api',
       queryParameters: {'key': Environment.rawgKey}));
 
+
+  List<Game> _jsonToGames(Map<String, dynamic> json){
+
+    final gameRawgResponse = RawgResponse.fromJson(json);
+    
+    final List<Game> games = gameRawgResponse.results
+        .map((gameRawg) => GameMapper.gameRawgToEntity(gameRawg))
+        .toList();
+    
+    return games;
+  }
+
+
+
   //Metodos que hacen las llamadas a los diferentes end-points de la api.
   @override
   Future<List<Game>> getNowPlaying({int page = 1}) async {
@@ -31,38 +45,26 @@ class RawgApiDatasource extends GamesDatasource {
     String datesParam = '$startDate,$endDate';
 
     final response = await dio.get('/games?dates=$datesParam&page_size=10');
-    final gameRawgResponse = RawgResponse.fromJson(response.data);
+    
 
-    final List<Game> games = gameRawgResponse.results
-        .map((gameRawg) => GameMapper.gameRawgToEntity(gameRawg))
-        .toList();
-
-    return games;
+    return _jsonToGames(response.data);
   }
 
   @override
   Future<List<Game>> getPopular({int page = 1}) async {
     final response = await dio.get('/games?page_size=10');
-    final gameRawgResponse = RawgResponse.fromJson(response.data);
+    
 
-    final List<Game> games = gameRawgResponse.results
-        .map((gameRawg) => GameMapper.gameRawgToEntity(gameRawg))
-        .toList();
-
-    return games;
+    return _jsonToGames(response.data);
   }
 
   @override
   Future<List<Game>> getRecomended({int page = 1}) async {
     
     final response = await dio.get('/games?page_size=10&ordering=-released&metacritic=95,100');
-    final gameRawgResponse = RawgResponse.fromJson(response.data);
+    
 
-    final List<Game> games = gameRawgResponse.results
-        .map((gameRawg) => GameMapper.gameRawgToEntity(gameRawg))
-        .toList();
-
-    return games;
+    return _jsonToGames(response.data);
   }
   
   @override
@@ -87,5 +89,19 @@ class RawgApiDatasource extends GamesDatasource {
         .map((screenshotRawg) => ScreenshotsMapper.screenshotsRawgToEntity(screenshotRawg))
         .toList();
     return screenshots;
+  }
+  
+  @override
+  Future<List<Game>> searchGames( String query ) async{
+
+    if(query.isEmpty) return [];
+
+    final response = await dio.get('/games',
+    queryParameters: {
+      'search':query
+    }
+    );
+
+    return _jsonToGames(response.data);
   }
 }

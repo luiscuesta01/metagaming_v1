@@ -35,7 +35,7 @@ class RawgResponse {
 
     factory RawgResponse.fromJson(Map<String, dynamic> json) => RawgResponse(
         count: json["count"],
-        next: json["next"],
+        next: json["next"] ?? '',
         previous: json["previous"],
         results: List<GameRawg>.from(json["results"].map((x) => GameRawg.fromJson(x))),
         seoTitle: json["seo_title"] ?? '',

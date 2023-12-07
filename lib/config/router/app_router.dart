@@ -4,7 +4,7 @@ import 'package:metagaming/auth/auth.dart';
 import '../../meta_gaming/presentation/screens/screens.dart';
 
 final appRouter = GoRouter(
-  initialLocation: '/login',
+  initialLocation: '/',
   routes: [
     
     GoRoute(

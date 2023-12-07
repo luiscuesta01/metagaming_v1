@@ -28,9 +28,15 @@ class GameRepositoryImpl extends GamesRepository {
   Future<Game> getGameById(String id) {
     return datasource.getGameById(id);
   }
+
   @override
   Future<List<Screenshots>> getScreenshotsById(String id) {
     return datasource.getScreenshotsById(id);
+  }
+  
+  @override
+  Future<List<Game>> searchGames(String query) {
+    return datasource.searchGames(query);
   }
 
 }

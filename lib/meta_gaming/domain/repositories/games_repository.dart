@@ -8,6 +8,7 @@ abstract class GamesRepository {
   Future <List<Game>> getRecomended({int page = 1});
   Future<Game> getGameById(String id);
   Future<List<Screenshots>> getScreenshotsById(String id);
+  Future <List<Game>> searchGames(String query);
 
   
 }
