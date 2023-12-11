@@ -45,8 +45,8 @@ class SideMenuState extends ConsumerState<SideMenu> {
                       
                     ),
                     
-                    accountName: Text('Luis'),
-                    accountEmail: Text('luiscr_01'),
+                    accountName: const Text('Luis'),
+                    accountEmail: const Text('luiscr_01'),
                     currentAccountPicture:
                         const CircleAvatar(backgroundImage:NetworkImage('https://viclisreus.files.wordpress.com/2017/10/aaa.jpg') ),
                   ),

@@ -6,3 +6,5 @@ export 'games/games_slideshow_provider.dart';
 export 'games/screenshots_game_provider.dart';
 
 export 'search/search_movies_provider.dart';
+export 'storage/cloud_storage_provider.dart';
+export 'storage/favorite_games_provider.dart';

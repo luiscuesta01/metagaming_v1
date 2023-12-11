@@ -4,11 +4,11 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:intl/intl.dart';
 import 'package:metagaming/meta_gaming/domain/entities/screenshots.dart';
+import 'package:metagaming/meta_gaming/domain/repositories/cloud_storage_repository.dart';
 import 'package:metagaming/meta_gaming/infrastructure/models/rawg/game_rawg.dart';
-import 'package:metagaming/meta_gaming/presentation/providers/games/game_info_provider.dart';
-import 'package:metagaming/meta_gaming/presentation/providers/games/screenshots_game_provider.dart';
 
 import '../../../domain/entities/game.dart';
+import '../../providers/providers.dart';
 
 class GameScreen extends ConsumerStatefulWidget {
   static const name = 'game-screen';
@@ -127,18 +127,17 @@ class _ScreenshotsSlide extends StatelessWidget {
           return Padding(
             padding: const EdgeInsets.all(12),
             child: ClipRRect(
-              borderRadius:
-                  BorderRadius.circular(10),
-               // Adjust the radius as needed
+              borderRadius: BorderRadius.circular(10),
+              // Adjust the radius as needed
               child: Container(
                 decoration: BoxDecoration(
                   boxShadow: [
-                BoxShadow(
-                  color: Colors.white.withOpacity(0.3),
-                  blurRadius: 7,
-                  offset: const Offset(0, 5),
-                ),
-              ],
+                    BoxShadow(
+                      color: Colors.white.withOpacity(0.3),
+                      blurRadius: 7,
+                      offset: const Offset(0, 5),
+                    ),
+                  ],
                 ),
                 width: currentSize.width, // Adjust the width as needed
                 child: Image.network(
@@ -154,7 +153,13 @@ class _ScreenshotsSlide extends StatelessWidget {
   }
 }
 
-class _HeaderGame extends StatelessWidget {
+final isFavoriteProvider = FutureProvider.family.autoDispose((ref, int gameId) {
+  final cloudStorageRepository = ref.watch(cloudStorageRepositoryProvider);
+
+  return cloudStorageRepository.isGameFavorite(gameId);
+});
+
+class _HeaderGame extends ConsumerWidget {
   const _HeaderGame({
     super.key,
     required this.colors,
@@ -167,14 +172,14 @@ class _HeaderGame extends StatelessWidget {
   final Game game;
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, ref) {
     final textStyle = Theme.of(context).textTheme;
     final gamePlayTime = game.playtime;
+    final isFavoriteFuture = ref.watch(isFavoriteProvider(game.id));
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 20, horizontal: 23),
       child: Column(
         children: [
-          
           Row(
             children: [
               Expanded(
@@ -188,15 +193,29 @@ class _HeaderGame extends StatelessWidget {
                 ),
               ),
               IconButton(
-                iconSize: 27,
-                color: colors.primary,
-                onPressed: () {},
-                icon: Icon(Icons.favorite_border_rounded),
-              ),
+                  iconSize: 27,
+                  color: colors.primary,
+                  onPressed: () async {
+                    await ref
+                        .read(favoriteGamesProvider.notifier)
+                        .toggleFavorite(game);
+                    ref.invalidate(isFavoriteProvider(game.id));
+                  },
+                  icon: isFavoriteFuture.when(
+                    loading: () => const CircularProgressIndicator(
+                      strokeWidth: 2,
+                    ),
+                    data: (isFavourite) => isFavourite
+                        ? const Icon(
+                            Icons.favorite_rounded,
+                            color: Colors.red,
+                          )
+                        : const Icon(Icons.favorite_border_rounded),
+                    error: (_, __) => throw UnimplementedError(),
+                  )),
             ],
           ),
           const SizedBox(height: 5),
-
           Row(
             children: [
               Container(
@@ -229,39 +248,49 @@ class _HeaderGame extends StatelessWidget {
                   return Icon(Icons.help);
                 }
               }).toList(),
-              Spacer(),
-              game.metacritic != 0 ? // o Expanded() aquí para ocupar el espacio restante
-              Container(
-                padding: EdgeInsets.symmetric(vertical: 1, horizontal: 8),
-                decoration: BoxDecoration(
-                  borderRadius: BorderRadius.circular(4),
-                  border: Border.all(
-                    color: game.metacritic > 75 ? Colors.green : Colors.orange,
-                  ),
-                ),
-                child: Text(
-                  game.metacritic.toString(),
-                  style: TextStyle(
-                    color: game.metacritic > 75 ? Colors.green : Colors.orange,
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
-              ):const SizedBox()
+              const Spacer(),
+              game.metacritic != 0
+                  ? // o Expanded() aquí para ocupar el espacio restante
+                  Container(
+                      padding: EdgeInsets.symmetric(vertical: 1, horizontal: 8),
+                      decoration: BoxDecoration(
+                        borderRadius: BorderRadius.circular(4),
+                        border: Border.all(
+                          color: game.metacritic > 75
+                              ? Colors.green
+                              : Colors.orange,
+                        ),
+                      ),
+                      child: Text(
+                        game.metacritic.toString(),
+                        style: TextStyle(
+                          color: game.metacritic > 75
+                              ? Colors.green
+                              : Colors.orange,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                    )
+                  : const SizedBox()
             ],
           ),
-
           Padding(
             padding: const EdgeInsets.only(top: 10),
             child: Align(
-              alignment: Alignment.centerLeft,
-              child: Text('AVERAGE PLAYTIME: $gamePlayTime HOURS')),
-          )
+                alignment: Alignment.centerLeft,
+                child: Text('AVERAGE PLAYTIME: $gamePlayTime HOURS')),
+          ),
+          Padding(
+            padding: const EdgeInsets.symmetric(vertical: 15),
+            child: Align(
+                alignment: Alignment.centerLeft,
+                child: GameStatusSelector(game: game)),
+          ),
         ],
       ),
     );
   }
 }
-
 
 class _CustomSliverAppBar extends StatelessWidget {
   final Game game;
@@ -307,6 +336,68 @@ class _CustomSliverAppBar extends StatelessWidget {
               ]))),
             )
           ],
+        ),
+      ),
+    );
+  }
+}
+
+class GameStatusSelector extends ConsumerWidget {
+  final Game game;
+
+  GameStatusSelector({required this.game});
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final cloudStorageRepository = ref.watch(cloudStorageRepositoryProvider);
+    final statuses = [
+      '',
+      'Jugado',
+      'No jugado',
+      'Completado',
+      'Jugando actualmente'
+    ];
+    final colors = Theme.of(context).colorScheme;
+    return DecoratedBox(
+      decoration: BoxDecoration(
+        color: Colors.white70, // color de fondo
+        border: Border.all(color: Colors.black38, width: 1), // borde
+        borderRadius: BorderRadius.circular(20), // bordes redondeados
+        boxShadow: <BoxShadow>[
+          // sombra
+          BoxShadow(
+            color: Colors.white38,
+            blurRadius: 3,
+          ),
+        ],
+      ),
+      child: Padding(
+        padding: EdgeInsets.symmetric(
+          horizontal: 10,
+        ),
+        child: DropdownButton<String>(
+          value: game.status,
+          items: statuses.map<DropdownMenuItem<String>>((String value) {
+            return DropdownMenuItem<String>(
+              value: value,
+              child: Text(value == '' ? '¿Lo has jugado?' : value),
+            );
+          }).toList(),
+          onChanged: (String? newValue) {
+            if (newValue != null && newValue != '') {
+              cloudStorageRepository.setGameStatus(game, newValue);
+            }
+          },
+          icon: Icon(
+            Icons.keyboard_arrow_down_rounded,
+            color: colors.primary,
+          ),
+          iconSize: 42,
+          underline: SizedBox(),
+          style: TextStyle(
+            color: colors.primary, // color del texto
+            fontSize: 20, // tamaño del texto
+          ),
         ),
       ),
     );

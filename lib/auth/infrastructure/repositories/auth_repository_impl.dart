@@ -1,31 +1,28 @@
-
-
 import 'package:metagaming/auth/domain/domain.dart';
-
-import '../infrastructure.dart';
-
+import 'package:metagaming/auth/infrastructure/datasources/firebase_auth_datasource.dart';
 
 class AuthRepositoryImpl extends AuthRepository {
-
   final AuthDataSource dataSource;
 
-  AuthRepositoryImpl({
-    AuthDataSource? dataSource
-  }) : dataSource = dataSource ?? AuthDataSourceImpl();
+  AuthRepositoryImpl({AuthDataSource? dataSource})
+      : dataSource = dataSource ?? AuthDataSourceImpl();
+
+  
 
   @override
-  Future<User> checkAuthStatus(String token) {
-    return dataSource.checkAuthStatus(token);
+  Future<UserMetaGaming> signInWithEmailPassword(
+      String email, String password) {
+    return dataSource.signInWithEmailPassword(email, password);
   }
 
   @override
-  Future<User> login(String email, String password) {
-    return dataSource.login(email, password);
+  Future<UserMetaGaming> registerWithEmailPassword(
+      String email, String password, String fullName) {
+    return dataSource.registerWithEmailPassword(email, password, fullName);
   }
 
   @override
-  Future<User> register(String email, String password, String fullName) {
-    return dataSource.register(email, password, fullName);
+  Future<void> signOut() {
+    return dataSource.signOut();
   }
-
 }

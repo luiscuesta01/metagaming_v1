@@ -6,73 +6,70 @@ import 'package:metagaming/auth/infrastructure/repositories/auth_repository_impl
 import 'package:metagaming/shared/infrastructure/services/key_value_storage_service.dart';
 import 'package:metagaming/shared/infrastructure/services/key_value_storage_service_impl.dart';
 
-
-
-final authProvider = StateNotifierProvider<AuthNotifier,AuthState>((ref) {
-
+final authProvider = StateNotifierProvider<AuthNotifier, AuthState>((ref) {
   final authRepository = AuthRepositoryImpl();
   final keyValueStorageService = KeyValueStorageServiceImpl();
 
-
   return AuthNotifier(
-    authRepository: authRepository,
-    keyValueStorageService: keyValueStorageService
-  );
+      authRepository: authRepository,
+      keyValueStorageService: keyValueStorageService);
 });
 
-
-
 class AuthNotifier extends StateNotifier<AuthState> {
-
   final AuthRepository authRepository;
   final KeyValueStorageService keyValueStorageService;
 
   AuthNotifier({
     required this.authRepository,
     required this.keyValueStorageService,
-  }): super( AuthState() ) {
-    checkAuthStatus();
+  }) : super(AuthState()) {
+    //checkAuthStatus();
   }
-  
 
-  Future<void> loginUser( String email, String password ) async {
+  Future<void> loginUser(String email, String password) async {
     await Future.delayed(const Duration(milliseconds: 500));
 
     try {
-      final user = await authRepository.login(email, password);
-      _setLoggedUser( user );
+      final user =
+          await authRepository.signInWithEmailPassword(email, password);
 
+      _setLoggedUser(user);
     } on CustomError catch (e) {
-      logout( e.message );
-    } catch (e){
-      logout( 'Error no controlado' );
+      logout(e.message);
+    } catch (e) {
+      logout('Credenciales incorrectas');
     }
-
-    // final user = await authRepository.login(email, password);
-    // state =state.copyWith(user: user, authStatus: AuthStatus.authenticated)
-
   }
 
-  void registerUser( String email, String password ) async {
-    
-  }
-
-  void checkAuthStatus() async {
-    final token = await keyValueStorageService.getValue<String>('token');
-    if( token == null ) return logout();
+  void registerUser(String email, String password, String fullName) async {
+    await Future.delayed(const Duration(milliseconds: 500));
 
     try {
-      final user = await authRepository.checkAuthStatus(token);
+      final user = await authRepository.registerWithEmailPassword(
+          email, password, fullName);
+
       _setLoggedUser(user);
-
+    } on CustomError catch (e) {
+      logout(e.message);
     } catch (e) {
-      logout();
+      logout('Credenciales incorrectas');
     }
-
   }
 
-  void _setLoggedUser( User user ) async {
-    
+//   void checkAuthStatus() async {
+//  final token = await keyValueStorageService.getValue<String>('token');
+//  if( token == null ) return logout();
+
+//  try {
+//    //final user = await authRepository.checkAuthStatus(token);
+//    _setLoggedUser(user);
+
+//  } catch (e) {
+//    logout();
+//  }
+// }
+
+  void _setLoggedUser(UserMetaGaming user) async {
     await keyValueStorageService.setKeyValue('token', user.token);
 
     state = state.copyWith(
@@ -82,46 +79,35 @@ class AuthNotifier extends StateNotifier<AuthState> {
     );
   }
 
-  Future<void> logout([ String? errorMessage ]) async {
-    
+  Future<void> logout([String? errorMessage]) async {
     await keyValueStorageService.removeKey('token');
 
     state = state.copyWith(
-      authStatus: AuthStatus.notAuthenticated,
-      user: null,
-      errorMessage: errorMessage
-    );
+        authStatus: AuthStatus.notAuthenticated,
+        user: null,
+        errorMessage: errorMessage);
   }
-
 }
-
-
 
 enum AuthStatus { checking, authenticated, notAuthenticated }
 
 class AuthState {
-
   final AuthStatus authStatus;
-  final User? user;
+  final UserMetaGaming? user;
   final String errorMessage;
 
-  AuthState({
-    this.authStatus = AuthStatus.checking, 
-    this.user, 
-    this.errorMessage = ''
-  });
+  AuthState(
+      {this.authStatus = AuthStatus.checking,
+      this.user,
+      this.errorMessage = ''});
 
   AuthState copyWith({
     AuthStatus? authStatus,
-    User? user,
+    UserMetaGaming? user,
     String? errorMessage,
-  }) => AuthState(
-    authStatus: authStatus ?? this.authStatus,
-    user: user ?? this.user,
-    errorMessage: errorMessage ?? this.errorMessage
-  );
-
-
-
-
+  }) =>
+      AuthState(
+          authStatus: authStatus ?? this.authStatus,
+          user: user ?? this.user,
+          errorMessage: errorMessage ?? this.errorMessage);
 }

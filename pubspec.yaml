@@ -11,6 +11,7 @@ dependencies:
   auto_size_text: ^3.0.0
   blurrycontainer: ^1.0.2
   card_swiper: ^3.0.1
+  cloud_firestore: ^4.13.5
   dio: ^5.3.3
   firebase_auth: ^4.15.0
   firebase_core: ^2.22.0

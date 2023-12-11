@@ -1,17 +1,16 @@
-
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:metagaming/auth/domain/entities/user.dart';
 
-
 class UserMapper {
-
-
-  static User userJsonToEntity( Map<String,dynamic> json ) => User(
-    id: json['id'],
-    email: json['email'],
-    fullName: json['fullName'],
-    roles: List<String>.from(json['roles'].map( (role) => role )),
-    token: json['token']
-  );
-
+  Future<UserMetaGaming> mapUserCredentialToUser(
+      UserCredential userCredential) async {
+    String? token = await userCredential.user!.getIdToken();
+    UserMetaGaming user = UserMetaGaming(
+      id: userCredential.user!.uid,
+      email: userCredential.user!.email!,
+      fullName: userCredential.user!.displayName ?? '',
+      token: token ?? '',
+    );
+    return user;
+  }
 }
-
